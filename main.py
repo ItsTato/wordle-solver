@@ -39,15 +39,27 @@ def getWordWeighs(word_list:list[str],letter_frequency:dict[str,int]) -> dict[st
 
 	return weighedWords
 
-def findHeaviestAllowedWord(word_list:list[str],weighed_word_list:dict[str,int],banned_letters:list[str]) -> str:
+def findHeaviestAllowedWord(word_list:list[str],weighed_word_list:dict[str,int],banned_letters:list[str],banned_words:list[str],include_letters:list[str],locked_letters:dict[int,str]) -> str:
 	heaviest_allowed_word:str = "ERROR"
 	heaviest_word_weight:int = 0
 
 	for word in word_list:
+		skipme:bool=False
+		if word in banned_words:
+			skipme=True
+			continue
 		for letter in word:
 			if letter in banned_letters:
+				skipme=True
 				continue
-		if weighed_word_list[word] > heaviest_word_weight:
+		for letter in include_letters:
+			if word.find(letter) < 0:
+				skipme = True
+		for i in range(5):
+			if word[i] != locked_letters[i+1] and locked_letters[i+1] != "":
+				skipme=True
+				continue
+		if weighed_word_list[word] > heaviest_word_weight and skipme is False:
 			heaviest_allowed_word = word
 			heaviest_word_weight = weighed_word_list[word]
 
@@ -109,17 +121,48 @@ if beginInput != "":
 os.system("cls" if os.name in ["nt","win"] else "clear")
 print("wordle-solver by ItsTato")
 
-for index in range(int(input("How many guesses do you have (i.e., 6)? "))):
-	lockedLetters:dict[int,str] = {
-		1: "",
-		2: "",
-		3: "",
-		4: "",
-		5: ""
-	}
-	yellowLetters:list[str] = []
-	grayLetters:list[str] = []
-	unknownLetters:list[str] = [*alphabet]
+lockedLetters:dict[int,str] = {
+	1: "",
+	2: "",
+	3: "",
+	4: "",
+	5: ""
+}
+yellowLetters:list[str] = []
+grayLetters:list[str] = []
+unknownLetters:list[str] = [*alphabet]
+triedWords:list[str] = []
 
-	nextWord:str = findHeaviestAllowedWord(words,weighedWords,grayLetters)
-	print(nextWord)
+for index in range(int(input("How many guesses do you have (i.e., 6)? "))):
+	nextWord:str = findHeaviestAllowedWord(words,weighedWords,grayLetters,triedWords,yellowLetters,lockedLetters)
+	fancyNextWord:str = ""
+	allGreen:bool=True
+	for letterPos,letter in enumerate(nextWord):
+		if lockedLetters[letterPos+1] == letter:
+			fancyNextWord = fancyNextWord+f"{Back.LIGHTGREEN_EX}{letter}{Back.RESET}"
+			continue
+		if letter in yellowLetters:
+			fancyNextWord = fancyNextWord+f"{Back.LIGHTYELLOW_EX}{letter}{Back.RESET}"
+			allGreen=False
+			continue
+		fancyNextWord = fancyNextWord+f"{Back.LIGHTBLACK_EX}{letter}{Back.RESET}"
+		allGreen=False
+	if allGreen:
+		print(f"Congratulations on winning with {fancyNextWord}! You're welcome ;)")
+		exit()
+	print(f"Our calculations have concluded this is the best word: {fancyNextWord}")
+	resultString:str = input("Please input the result string: ")
+	if not resultString.find(",") > 0:
+		resultString = resultString+","
+	yellows:list[str] = [*resultString.split(",")[1]]
+	for yellow in yellows:
+		yellowLetters.append(yellow)
+	for letterPos, letter in enumerate(resultString.split(",")[0]):
+		if letter.isupper():
+			lockedLetters[letterPos+1] = letter.lower()
+			continue
+		if not letter in yellows:
+			grayLetters.append(letter)
+			continue
+	triedWords.append(resultString.split(",")[0])
+	print(f"Factored \"{resultString.split(',')[0].lower()}\"!")
