@@ -35,7 +35,7 @@ def getWordWeighs(word_list:list[str],letter_frequency:dict[str,int]) -> dict[st
 	
 	for word in word_list:
 		for letter in word:
-			weighedWords[word] += letter_frequency[letter]
+			weighedWords[word] += round(letter_frequency[letter]/word.count(letter))
 
 	return weighedWords
 
@@ -49,6 +49,7 @@ def findHeaviestAllowedWord(word_list:list[str],weighed_word_list:dict[str,int],
 				continue
 		if weighed_word_list[word] > heaviest_word_weight:
 			heaviest_allowed_word = word
+			heaviest_word_weight = weighed_word_list[word]
 
 	return heaviest_allowed_word
 
