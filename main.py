@@ -112,7 +112,6 @@ print(f" > {Back.LIGHTGREEN_EX}Green letters{Back.RESET} are marked with a capit
 print(f" > {Back.LIGHTYELLOW_EX}Yellow letters{Back.RESET} are appended at the end after a ','")
 print(f" > Multiple yellows would look like: 'edify,{Style.BRIGHT}eiy{Style.RESET_ALL}'.")
 print(f" > ALL other letters are {Style.BRIGHT}DISREGARDED AS GRAYS{Style.RESET_ALL}.")
-print(f" > {Style.BRIGHT}EVEN IF THERE ARE NO YELLOWS, ADD A ,{Style.RESET_ALL}")
 beginInput:str = input("Press ENTER to acknowledge and begin a game: ")
 if beginInput != "":
 	print("Key other than ENTER entered as well, game closing.")
