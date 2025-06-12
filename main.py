@@ -142,13 +142,8 @@ for index in range(int(input("How many guesses do you have (i.e., 6)? "))):
 			continue
 		if letter in yellowLetters:
 			fancyNextWord = fancyNextWord+f"{Back.LIGHTYELLOW_EX}{letter}{Back.RESET}"
-			allGreen=False
 			continue
 		fancyNextWord = fancyNextWord+f"{Back.LIGHTBLACK_EX}{letter}{Back.RESET}"
-		allGreen=False
-	if allGreen:
-		print(f"Congratulations on winning with {fancyNextWord}! You're welcome ;)")
-		exit()
 	print(f"Our calculations have concluded this is the best word: {fancyNextWord}")
 	resultString:str = input("Please input the result string: ")
 	if not resultString.find(",") > 0:
@@ -160,8 +155,13 @@ for index in range(int(input("How many guesses do you have (i.e., 6)? "))):
 		if letter.isupper():
 			lockedLetters[letterPos+1] = letter.lower()
 			continue
+		else:
+			allGreen = False
 		if not letter in yellows:
 			grayLetters.append(letter)
 			continue
 	triedWords.append(resultString.split(",")[0])
+	if allGreen:
+		print(f"Congratulations on winning with {Back.LIGHTGREEN_EX}{resultString.split(',')[0].upper()}{Back.RESET}! You're welcome ;)")
+		exit()
 	print(f"Factored \"{resultString.split(',')[0].lower()}\"!")
